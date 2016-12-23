@@ -10,7 +10,9 @@ Autoload::register();
 $resquest = new CurlRequest();
 $resquest->prepare('http://api.wunderground.com/api/'. WEATHER_UNDERGROUND_KEY . '/conditions/q/CA/San_Francisco.json');
 $resquest->setRequestContent('json');
-$result = $resquest->execute(); ?>
+$result = $resquest->execute();
+
+var_dump($resquest->getHeaderRow('server')); ?>
 
 <?= '<pre>' ?>
 <?php var_dump(json_decode($result)); ?>

@@ -2,6 +2,8 @@
 
 namespace ATEKA;
 
+use ATEKA\TagWrapper;
+
 class CurlRequest
 {
     protected $ch;
@@ -19,22 +21,90 @@ class CurlRequest
         }
     }
 
-    public function getResponseCode()
-    {
-
-        return $this->responseCode;
-    }
-
+    /**
+     * @return mixed
+     */
     public function getResponseHeader()
     {
-
         return $this->responseHeader;
     }
 
+    /**
+     * @param mixed $responseHeader
+     */
+    public function setResponseHeader($responseHeader)
+    {
+        $responseHeader = TagWrapper::TagPre($responseHeader);
+        $this->responseHeader = $responseHeader;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getResponseBody()
     {
-
         return $this->responseBody;
+    }
+
+    /**
+     * @param mixed $responseBody
+     */
+    public function setResponseBody($responseBody)
+    {
+        $this->responseBody = $responseBody;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getResponseCode()
+    {
+        return $this->responseCode;
+    }
+
+    /**
+     * @param mixed $responseCode
+     */
+    public function setResponseCode($responseCode)
+    {
+        $this->responseCode = $responseCode;
+    }
+
+    public function getHeaderRow($row)
+    {
+        $accepted = [
+                     'access-control-allow-credentials',
+                     'access-control-allow-origin',
+                     'content-type',
+                     'last-modified',
+                     'server',
+                     'x-creationtime',
+                     'expires',
+                     'cache-control',
+                     'pragma',
+                     'date',
+                     'content-length',
+                     'location',
+                     'connection',
+                     'set-cookie',
+        ];
+        if (!in_array(strtolower($row), $accepted)) {
+
+            throw new \Exception();
+        }
+
+        $headers = explode(PHP_EOL, $this->getResponseHeader());
+        foreach ($headers as $header) {
+            $key = strtolower(substr($header, 0, strlen($row)));
+            var_dump($key);
+            var_dump($header);
+            var_dump(strrpos($key, strtolower($row)));
+            if (strpos(strtolower($row), $key) === true) {
+                echo 'passed';
+                return substr($header, strlen($row));
+            }
+        }
+        echo 'fail2';
     }
 
 
@@ -73,15 +143,13 @@ class CurlRequest
         }
     }
 
-
-
     public function execute()
     {
         $response = curl_exec($this->ch);
         $this->responseCode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
         $header_size = curl_getinfo($this->ch, CURLINFO_HEADER_SIZE);
-        $this->responseHeader = substr($response, 0, $header_size);
-        $this->responseBody = substr($response, $header_size);
+        $this->setResponseHeader(substr($response, 0, $header_size));
+        $this->setResponseBody(substr($response, $header_size));
         curl_close($this->ch);
 
         return $this->responseBody;
