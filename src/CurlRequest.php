@@ -90,18 +90,15 @@ class CurlRequest
         ];
         if (!in_array(strtolower($row), $accepted)) {
 
-            throw new \Exception();
+            return 'Error please row must contain '. implode(', ', $accepted);
         }
 
         $headers = explode(PHP_EOL, $this->getResponseHeader());
         foreach ($headers as $header) {
-            $key = strtolower(substr($header, 0, strlen($row)));
-            var_dump($key);
-            var_dump($header);
-            var_dump(strrpos($key, strtolower($row)));
-            if (strpos(strtolower($row), $key) === true) {
-                echo 'passed';
-                return substr($header, strlen($row));
+            $key = strtolower($header);
+            if (strpos($key, $row) !== false) {
+
+                return substr($header, strlen($row)+2);
             }
         }
         echo 'fail2';

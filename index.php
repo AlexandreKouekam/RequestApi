@@ -12,7 +12,7 @@ $resquest->prepare('http://api.wunderground.com/api/'. WEATHER_UNDERGROUND_KEY .
 $resquest->setRequestContent('json');
 $result = $resquest->execute();
 
-var_dump($resquest->getHeaderRow('server')); ?>
+var_dump($resquest->getHeaderRow('content-type')); ?>
 
 <?= '<pre>' ?>
 <?php var_dump(json_decode($result)); ?>
